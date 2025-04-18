@@ -36,8 +36,7 @@
 (provide 'clipdiff)
 ;;; clipdiff.el ends here
 
-(eval-when-compile
-  (require 'cl-lib))
+(eval-when-compile (require 'cl-lib))
 
 (cl-defstruct clipdiff--ln
   "A struct representing a line in the diff output.
@@ -53,6 +52,11 @@ Each element is (BEFORE . AFTER) where BEFORE / AFTER are lists of
          hunks before after in)
     (dolist (l lines)
       (cond
+       ;; Skip file headers (--- and +++ lines)
+       ((or (string-prefix-p "--- " l)
+            (string-prefix-p "+++ " l))
+        nil)
+       ;; Hunk headers
        ((string-prefix-p "@@" l)
         (when in
           (push (cons (nreverse before) (nreverse after)) hunks)
